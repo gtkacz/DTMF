@@ -93,7 +93,7 @@ def main():
     
     x, y=signal.calcFFT(recording, fs)
     signal.plotFFT(recording, fs)
-    index=peakutils.indexes(np.abs(y), thres=0.2, min_dist=10)
+    index=peakutils.indexes(y, thres=0.2, min_dist=10)
     for freq in x[index]:
         if int(freq) in range(1100, 1700):
             freq1=get_freq1(freq)
