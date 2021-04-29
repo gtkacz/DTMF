@@ -6,7 +6,7 @@ import numpy as np
 import sounddevice as sd
 import matplotlib.pyplot as plt
 import time, os
-from tkinter import messagebox, Tk, ttk
+from tkinter import messagebox, Tk, ttk, Label
 from tkinter.filedialog import askopenfilename
 
 def todB(s):
@@ -70,8 +70,9 @@ def resultado(freq1, freq2):
     window=Tk()
     window.resizable(False, False)
     window.eval('tk::PlaceWindow . center')
-    subtitulo=ttk.Label(window, text='O símbolo correspondete a este som é:')
-    resultado=ttk.Label(window, text=symbol)
+    subtitulo=Label(window, text='O símbolo correspondete a este som é:', padx=50, pady=10)
+    resultado=ttk.Label(window, text=symbol, padding=5)
+    resultado.config(font=("Calibri", 44))
     subtitulo.grid(column=0, row=0)
     resultado.grid(column=0, row=1)
     window.mainloop()
@@ -107,3 +108,4 @@ if __name__=='__main__':
     t=np.linspace(-T,T,T*fs)
     som=None
     main()
+    # resultado(1300, 900)
