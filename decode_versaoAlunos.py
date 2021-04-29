@@ -5,9 +5,10 @@ import peakutils
 import numpy as np
 import sounddevice as sd
 import matplotlib.pyplot as plt
-import time, os
+import time, os, wave
 from tkinter import messagebox, Tk, ttk, Label
 from tkinter.filedialog import askopenfilename
+from scipy.io import wavfile
 
 def todB(s):
     sdB=10*np.log10(s)
@@ -21,7 +22,8 @@ def loadsound():
     
     def recordmic():
         global som
-        messagebox.showinfo('Gravando', 'Som gravado')
+        messagebox.showinfo('Gravação começando', 'Gravação irá começar em 5 segundos...')
+        time.sleep(5)
         audio=sd.rec(int(T * fs))
         sd.wait()
         window.destroy()
@@ -29,9 +31,11 @@ def loadsound():
 
     def loadsoundfile():
         global som
-        file=askopenfilename(initialdir=os.getcwd(), title='Selecione o arquivo de áudio a ser identificado', filetypes=[('Sound Files', '.wav'), ('Sound Files', '.mp4'), ('Sound Files', '.ogg')])
+        file=askopenfilename(initialdir=os.getcwd(), title='Selecione o arquivo de áudio a ser identificado', filetypes=[('Sound Files', '.wav')])
         window.destroy()
-        som=file
+        # with open(file, 'rb') as f:
+        #     som=file.read()
+        samplerate, som = wavfile.read(file)
     
     Column1=ttk.Button(window, text='Carregar um arquivo', command=loadsoundfile)
     Column2=ttk.Button(window, text='Gravar meu microfone', command=recordmic)
@@ -85,15 +89,24 @@ def main():
     sd.default.channels=1
     
     loadsound()
-    recording=sd.playrec(som)
-    sd.wait()
     
-    plt.plot(t, recording)
+    sd.playrec(som)
+    
+    plt.plot(t[:10000], som[:10000])
     plt.title("Som gravado")
+    plt.autoscale(enable=True, axis='both', tight=True)
     plt.show()
     
-    x, y=signal.calcFFT(recording, fs)
-    signal.plotFFT(recording, fs)
+    sd.wait()
+    
+    x, y=signal.calcFFT(som, fs)
+    # signal.plotFFT(som, fs)
+    
+    plt.plot(x, y)
+    plt.title('Transformada de Fourier do som gravado')
+    plt.autoscale(enable=True, axis='both', tight=True)
+    plt.show()
+    
     index=peakutils.indexes(y, thres=0.2, min_dist=10)
     for freq in x[index]:
         if int(freq) in range(1100, 1700):
@@ -105,7 +118,6 @@ def main():
 if __name__=='__main__':
     fs=44100 
     T=1
-    t=np.linspace(-T,T,T*fs)
+    t=np.linspace(0,2*T,T*fs)
     som=None
     main()
-    # resultado(1300, 900)

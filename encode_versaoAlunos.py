@@ -77,12 +77,12 @@ def tabelaDTMF(digit):
             'X':(1209, 941), '0':(1336, 941), '#':(1477, 941), 'D':(1633, 941)}
     return tabela[str(digit)]
     
-def getfilename(type):
+def getfilename(type, symbol):
     time=datetime.now().strftime("%Y-%m-%d at %Hhrs %Mmin %Ss")
     if type=='log':
-        filename=f'emissão ({time}).log'
+        filename=f'Emissão referente ao símbolo {symbol} de ({time}).log'
     elif type=='som':
-        filename=f'emissão ({time}).wav'
+        filename=f'Emissão referente ao símbolo {symbol} de ({time}).wav'
     return filename
 
 def info(string):
@@ -103,7 +103,7 @@ def main():
     dialPad()
     
     if quer_log==True:
-        logging.basicConfig(filename=getfilename('log'), level=logging.INFO, format='[%(asctime)s] {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+        logging.basicConfig(filename=getfilename('log', digit), level=logging.INFO, format='[%(asctime)s] {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s', datefmt='%H:%M:%S')
     
     info(f'Gerando tons base referentes ao símbolo: {digit}')
     freq1, freq2=tabelaDTMF(digit)
@@ -112,12 +112,12 @@ def main():
     fs=44100
     F=1
     T=1
-    t=np.linspace(-T, T, T*fs)
+    t=np.linspace(0, 2*T, T*fs)
     sd.default.samplerate=fs
     sd.default.channels=1
     
-    x1, y1=signal.generateSin(freq1, 1, T, fs)
-    x2, y2=signal.generateSin(freq2, 1, T, fs)
+    x1, y1=signal.generateSin(freq1, F, T, fs)
+    x2, y2=signal.generateSin(freq2, F, T, fs)
     y3=y1+y2
     
     info(f'Gerando tom referente ao símbolo: {digit}')
@@ -125,18 +125,19 @@ def main():
     
     info('Plotando os gráficos')
     plt.figure()
-    plt.plot(t[:300], y1[:300], alpha=0.5, label= (f'{freq1}Hz'))
-    plt.plot(t[:300], y2[:300], 'g', alpha=0.5, label=(f'{freq2}Hz'))
+    plt.plot(t[:300], y1[:300], 'b--', alpha=0.5, label= (f'{freq1}Hz'))
+    plt.plot(t[:300], y2[:300], 'g--', alpha=0.5, label=(f'{freq2}Hz'))
     plt.plot(t[:300], y3[:300], 'k', alpha=0.75, label=(f'Soma de {freq1}Hz e {freq2}Hz'))
     plt.legend()
     plt.title(f'Frequências do símbolo {digit}')
     plt.grid(True)
+    plt.autoscale(enable=True, axis='both', tight=True)
     plt.show()
     
     sd.wait()
     
     if quer_arquivo==True:
-        filename=getfilename('som')
+        filename=getfilename('som', digit)
         info(f'Salvando o arquivo de som em: {filename}')
         sf.write(filename, y3, fs) 
 
