@@ -1,7 +1,0 @@
-[14:35:20] {d:\Insper\4º semestre\CamFis\Projeto 7\encode_versaoAlunos.py:77} INFO - Inicializando encoder
-[14:35:20] {d:\Insper\4º semestre\CamFis\Projeto 7\encode_versaoAlunos.py:81} INFO - Aguardando usuário
-[14:35:21] {d:\Insper\4º semestre\CamFis\Projeto 7\encode_versaoAlunos.py:85} INFO - Gerando tons base referentes ao símbolo: 9
-[14:35:21] {d:\Insper\4º semestre\CamFis\Projeto 7\encode_versaoAlunos.py:89} INFO - Executando as senoides (emitindo o som)
-[14:35:21] {d:\Insper\4º semestre\CamFis\Projeto 7\encode_versaoAlunos.py:102} INFO - Gerando tom referente ao símbolo: 9
-[14:35:21] {d:\Insper\4º semestre\CamFis\Projeto 7\encode_versaoAlunos.py:106} INFO - Plotando os gráficos
-[14:35:28] {d:\Insper\4º semestre\CamFis\Projeto 7\encode_versaoAlunos.py:120} INFO - Salvando o som em: emissão (2021-04-26 at 14hrs 35min 28s).wav

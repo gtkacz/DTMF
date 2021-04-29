@@ -6,98 +6,104 @@ import numpy as np
 import sounddevice as sd
 import matplotlib.pyplot as plt
 import time, os
-from scipy import signal
-from scipy.fftpack import fft, fftshift
-from tkinter import *
-from tkinter import messagebox
+from tkinter import messagebox, Tk, ttk
 from tkinter.filedialog import askopenfilename
-from functools import partial
 
 def todB(s):
-    sdB = 10*np.log10(s)
+    sdB=10*np.log10(s)
     return(sdB)
 
 def loadsound():
-    window = Tk()
-    window.title("Escolha o método de áudio")
+    window=Tk()
+    window.title('Escolha o método de áudio')
     window.resizable(False, False)
     window.eval('tk::PlaceWindow . center')
     
     def recordmic():
         global som
-        messagebox.showinfo('Gravando', 'Estamos gravando!')
-        audio = sd.rec(int(T * fs))
+        messagebox.showinfo('Gravando', 'Som gravado')
+        audio=sd.rec(int(T * fs))
         sd.wait()
         window.destroy()
         som=audio
 
     def loadsoundfile():
         global som
-        file=askopenfilename(initialdir=os.getcwd(), title="Selecione o arquivo de áudio a ser identificado", filetypes=[("Sound Files", ".wav"), ("Sound Files", ".mp4"), ("Sound Files", ".ogg")])
+        file=askopenfilename(initialdir=os.getcwd(), title='Selecione o arquivo de áudio a ser identificado', filetypes=[('Sound Files', '.wav'), ('Sound Files', '.mp4'), ('Sound Files', '.ogg')])
         window.destroy()
         som=file
     
-    Column1=Button(window, text="Carregar um arquivo", command=loadsoundfile)
-    Column2=Button(window, text="Gravar meu microfone", command=recordmic)
+    Column1=ttk.Button(window, text='Carregar um arquivo', command=loadsoundfile)
+    Column2=ttk.Button(window, text='Gravar meu microfone', command=recordmic)
     Column1.grid(row=3, column=2, padx=25, pady=10)
     Column2.grid(row=3, column=4, padx=25, pady=10)
 
     window.mainloop()
 
+def get_freq1(freq):
+    freqs=[1209, 1336, 1477, 1633]
+    for f in freqs:
+        if int(freq) in range(f-50, f+50):
+            return_freq=f
+    return return_freq
+
+def get_freq2(freq):
+    freqs=[697, 770, 852, 941]
+    for f in freqs:
+        if int(freq) in range(f-50, f+50):
+            return_freq=f
+    return return_freq
+
+def getsymbol(freq1, freq2):
+    tabela={'1':(1209, 697), '2':(1336, 697), '3':(1477, 697), 'A':(1633, 697),
+            '4':(1209, 770), '5':(1336, 770), '6':(1477, 770), 'B':(1633, 770),
+            '7':(1209, 852), '8':(1336, 852), '9':(1477, 852), 'C':(1633, 852),
+            'X':(1209, 941), '0':(1336, 941), '#':(1477, 941), 'D':(1633, 941)}
+    for symbol, freqs in tabela.items():
+        if freq1==freqs[0] and freq2==freqs[1]:
+            return symbol
+
+def resultado(freq1, freq2):
+    freq1=get_freq1(freq1)
+    freq2=get_freq2(freq2)
+    symbol=getsymbol(freq1, freq2)
+    window=Tk()
+    window.resizable(False, False)
+    window.eval('tk::PlaceWindow . center')
+    subtitulo=ttk.Label(window, text='O símbolo correspondete a este som é:')
+    resultado=ttk.Label(window, text=symbol)
+    subtitulo.grid(column=0, row=0)
+    resultado.grid(column=0, row=1)
+    window.mainloop()
+
 def main():
     global som
-    signal = signalMeu()
+    signal=signalMeu()
 
-    sd.default.samplerate = fs
-    sd.default.channels = 1
+    sd.default.samplerate=fs
+    sd.default.channels=1
     
     loadsound()
+    recording=sd.playrec(som)
+    sd.wait()
     
-    print("...     FIM")
-
-
-    #analise sua variavel "audio". pode ser um vetor com 1 ou 2 colunas, lista, isso dependerá so seu sistema, drivers etc...
-    #extraia a parte que interessa da gravação (as amostras) gravando em uma variável "dados". Isso porque a variável audio pode conter dois canais e outas informações). 
-    
-    # use a funcao linspace e crie o vetor tempo. Um instante correspondente a cada amostra!
-    t = np.linspace(inicio,fim,numPontos)
-    # plot do gravico áudio gravado (dados) vs tempo! Não plote todos os pontos, pois verá apenas uma mancha (freq altas) . 
-       
-    ## Calcula e exibe o Fourier do sinal audio. como saida tem-se a amplitude e as frequencias
-    xf, yf = signal.calcFFT(y, fs)
-    plt.figure("F(y)")
-    plt.plot(xf,yf)
-    plt.grid()
-    plt.title('Fourier audio')
-    
-    #agora, voce tem os picos da transformada, que te informam quais sao as frequencias mais presentes no sinal. Alguns dos picos devem ser correspondentes às frequencias do DTMF!
-    #Para descobrir a tecla pressionada, voce deve extrair os picos e compara-los à tabela DTMF
-    #Provavelmente, se tudo deu certo, 2 picos serao PRÓXIMOS aos valores da tabela. Os demais serão picos de ruídos.
-
-    # para extrair os picos, voce deve utilizar a funcao peakutils.indexes(,,)
-    # Essa funcao possui como argumentos dois parâmetros importantes: "thres" e "min_dist".
-    # "thres" determina a sensibilidade da funcao, ou seja, quao elevado tem que ser o valor do pico para de fato ser considerado um pico
-    #"min_dist" é relatico tolerancia. Ele determina quao próximos 2 picos identificados podem estar, ou seja, se a funcao indentificar um pico na posicao 200, por exemplo, só identificara outro a partir do 200+min_dis. Isso evita que varios picos sejam identificados em torno do 200, uma vez que todos sejam provavelmente resultado de pequenas variações de uma unica frequencia a ser identificada.   
-    # Comece com os valores:
-    index = peakutils.indexes(yf, thres=0.4, min_dist=50)
-    print("index de picos {}" .format(index)) #yf é o resultado da transformada de fourier
-
-    #printe os picos encontrados! 
-    # Aqui você deverá tomar o seguinte cuidado: A funcao  peakutils.indexes retorna as POSICOES dos picos. Não os valores das frequências onde ocorrem! Pense a respeito
-    
-    #encontre na tabela duas frequencias proximas às frequencias de pico encontradas e descubra qual foi a tecla
-    #print o valor tecla!!!
-    #Se acertou, parabens! Voce construiu um sistema DTMF
-
-    #Você pode tentar também identificar a tecla de um telefone real! Basta gravar o som emitido pelo seu celular ao pressionar uma tecla. 
-
-      
-    ## Exiba gráficos do fourier do som gravados 
+    plt.plot(t, recording)
+    plt.title("Som gravado")
     plt.show()
+    
+    x, y=signal.calcFFT(recording, fs)
+    signal.plotFFT(recording, fs)
+    index=peakutils.indexes(np.abs(y), thres=0.2, min_dist=10)
+    for freq in x[index]:
+        if int(freq) in range(1100, 1700):
+            freq1=get_freq1(freq)
+        if int(freq) in range(500, 1000):
+            freq2=get_freq2(freq)
+    resultado(freq1, freq2)
 
-if __name__ == "__main__":
-    fs = 44100 
-    T  = 1
-    t  = np.linspace(-T,T,T*fs)
+if __name__=='__main__':
+    fs=44100 
+    T=1
+    t=np.linspace(-T,T,T*fs)
     som=None
     main()
