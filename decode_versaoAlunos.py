@@ -92,7 +92,7 @@ def main():
     
     sd.playrec(som)
     
-    plt.plot(t[:10000], som[:10000])
+    plt.plot(t[:200], som[:200])
     plt.title("Som gravado")
     plt.autoscale(enable=True, axis='both', tight=True)
     plt.show()
@@ -102,17 +102,22 @@ def main():
     x, y=signal.calcFFT(som, fs)
     # signal.plotFFT(som, fs)
     
-    plt.plot(x, y)
-    plt.title('Transformada de Fourier do som gravado')
-    plt.autoscale(enable=True, axis='both', tight=True)
-    plt.show()
-    
     index=peakutils.indexes(y, thres=0.2, min_dist=10)
     for freq in x[index]:
         if int(freq) in range(1100, 1700):
             freq1=get_freq1(freq)
+            index1=int(freq)
         if int(freq) in range(500, 1000):
             freq2=get_freq2(freq)
+            index2=int(freq)
+    
+    plt.plot(x, y)
+    plt.title('Transformada de Fourier do som gravado')
+    # plt.text(index1, y[index1]-0.5, f'Frequência de pico 1: {y[index1]}Hz')
+    # plt.text(index2+1, y[index2]-1, f'Frequência de pico 2: {y[index2]}Hz')
+    plt.autoscale(enable=True, axis='both', tight=True)
+    plt.show()        
+    
     resultado(freq1, freq2)
 
 if __name__=='__main__':

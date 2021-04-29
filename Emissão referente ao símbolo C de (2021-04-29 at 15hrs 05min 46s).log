@@ -1,0 +1,5 @@
+[15:05:46] {d:\Insper\4º semestre\CamFis\Projeto 7\encode_versaoAlunos.py:92} INFO - Gerando tons base referentes ao símbolo: C
+[15:05:46] {d:\Insper\4º semestre\CamFis\Projeto 7\encode_versaoAlunos.py:92} INFO - Executando as senoides (emitindo o som)
+[15:05:46] {d:\Insper\4º semestre\CamFis\Projeto 7\encode_versaoAlunos.py:92} INFO - Gerando tom referente ao símbolo: C
+[15:05:46] {d:\Insper\4º semestre\CamFis\Projeto 7\encode_versaoAlunos.py:92} INFO - Plotando os gráficos
+[15:05:49] {d:\Insper\4º semestre\CamFis\Projeto 7\encode_versaoAlunos.py:92} INFO - Salvando o arquivo de som em: Emissão referente ao símbolo C de (2021-04-29 at 15hrs 05min 49s).wav
